@@ -1,0 +1,56 @@
+
+server:
+  port: 8001
+
+
+spring:
+  #Spring Boot 2.6.X使用PathPatternMatcher匹配路径，Swagger引用的Springfox使用的路径匹配是基于AntPathMatcher的，所以需要进行配置
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  application:
+    name: book-collection
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://106.53.124.182:3306/Book_Collection_System?characterEncoding=utf-8&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    initial-size: 5
+    min-idle: 5
+    max-active: 50
+    max-wait: 60000
+    time-between-eviction-runs-millis: 60000
+    min-evictable-idle-time-millis: 300000
+
+
+  rabbitmq:
+    host: 106.53.124.182
+    port: 5672
+    virtual-host: /bookcollection
+    username: root
+    password: root
+    publisher-returns: true #消息发送到队列确认
+
+  servlet:
+    multipart:
+      enabled: true #开启文件上传
+      max-file-size: 10MB #限制文件上传大小为10M
+
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false #关闭缓存
+
+minio:
+  endpoint: http://106.53.124.182:9000
+  bucketName: public
+  accessKey: OV5xLXR9kUxpO3Oi
+  secretKey: w0UvfFW2NNVkVj7N4JeeVUfH1wpEpOFj
+
+
+
+
