@@ -55,6 +55,4 @@ public class Book extends BaseEntity {
     @ApiModelProperty(value = "学工号")
     private String userId;
 
-
-
 }
