@@ -30,13 +30,13 @@ public class TokenUtil {
      * @param request
      * @return
      */
-//    public static String getUserId(HttpServletRequest request) {
-//        String token = getToken(request);
-//        if(!StringUtils.isEmpty(token)) {
-//            return JwtHelper.getUserId(token);
-//        }
-//        return null;
-//    }
-//
+    public static String getUserId(HttpServletRequest request) {
+        String token = getToken(request);
+        if(!StringUtils.isEmpty(token)) {
+            return JwtHelper.getUserId(token);
+        }
+        return null;
+    }
+
 
 }

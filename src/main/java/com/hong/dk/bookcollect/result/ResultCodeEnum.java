@@ -24,12 +24,12 @@ public enum ResultCodeEnum {
     PASSWORD_ERROR(224, "原密码错误"),
 //    "申诉正在审核中，请耐心等待",201
     APPEAL_ING(225, "申诉正在审核中，请耐心等待哦"),
+    REMOTE_LOGIN(226,"账户已在别处登录,请重新登陆" ),
+
+    SIGN_EXPIRED(300, "签名过期");
 
 
-    SIGN_EXPIRED(300, "签名过期"),
 
-
-    ;
 
     private Integer code;
     private String message;

@@ -49,11 +49,15 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
         //获取token中的用户id
         String userId = JwtHelper.getUserId(token);
         //通过userId查询redis中的token2
-        String token2 = (String) redisTemplate.opsForValue().get(userId+":"+userId);
-        //验证token2是否为空
-        if ( null == token2 || "".equals(token2.trim()) ) {
+        String token_redis = (String) redisTemplate.opsForValue().get(userId+":"+userId);
+        //验证token_redis是否为空，如果为空则将token2存入redis中
+        if ( null == token_redis || "".equals(token_redis.trim()) ) {
             redisTemplate.opsForValue().set(userId+":"+userId,token,3600 * 3,TimeUnit.SECONDS);
         }
+        if(!token.equals(token_redis)){
+            Asserts.fail(ResultCodeEnum.REMOTE_LOGIN);
+        }
+
         //token2的过期时间，如果小于1小时，则重新设置过期时间为3小时
         if ( redisTemplate.getExpire(userId+":"+userId, TimeUnit.SECONDS ) < 3600) {
              redisTemplate.expire(userId+":"+userId, 3600 * 3, TimeUnit.SECONDS);

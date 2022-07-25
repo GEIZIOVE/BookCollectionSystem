@@ -3,11 +3,13 @@ package com.hong.dk.bookcollect.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.dk.bookcollect.config.MinioConfig;
 import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.handler.Asserts;
 import com.hong.dk.bookcollect.mapper.UserMapper;
+import com.hong.dk.bookcollect.result.Consts;
 import com.hong.dk.bookcollect.result.ResultCodeEnum;
 import com.hong.dk.bookcollect.service.UserService;
 import com.hong.dk.bookcollect.utils.*;
@@ -48,19 +50,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Map<String, Object> login(String userId, String password) {
 
-        String dubToken = redisTemplate.opsForValue().get(userId + ":" + userId);
-        if (dubToken != null) {
-            //如果dubToken不为空，判断token是否过期
-            if (JwtHelper.isTokenExpired(dubToken)) {
-                //如果过期，删除redis中的token
-                redisTemplate.delete(userId + ":" + userId);
-            } else {
-                Asserts.fail("请勿重复登录",201);
-            }
-        }
-
+//        String dubToken = redisTemplate.opsForValue().get(userId + ":" + userId);
+//        if (dubToken != null) {
+//            //如果dubToken不为空，判断token是否过期
+//            if (JwtHelper.isTokenExpired(dubToken)) {
+//                //如果过期，删除redis中的token
+//                redisTemplate.delete(userId + ":" + userId);
+//            } else {
+//                Asserts.fail("请勿重复登录",201);
+//            }
+//        }
         //根据userID查询用户信息
-        User user = baseMapper.selectOne(new QueryWrapper<User>().eq("user_id", userId));
+        User user =  baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
 
         if (user == null) {
             Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
@@ -68,42 +69,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             Asserts.fail(ResultCodeEnum.DATA_ERROR);
         } else {
             String token = JwtHelper.createToken(user.getUserId(), user.getRegister()); //生成token
+            Integer expire = 2;  //设置存入redis的token有效期2小时
+            redisTemplate.opsForValue().set(userId+":"+userId,token, expire, TimeUnit.HOURS); //参数依次为 key,value,过期时间,时间单位
             map.put("msg", "登录成功");
             map.put("token",token);
-            Integer expire = 2;  //设置token有效期2小时
-            //设置 token 至 redis
-            redisTemplate.opsForValue().set(userId+":"+userId,token, expire, TimeUnit.HOURS); //参数依次为 key,value,过期时间,时间单位
         }
         return map;
     }
 
     @Override
     public void logout(HttpServletRequest request) {
-        //清除redis中的token
-        String token = TokenUtil.getToken(request);
-        String userId = JwtHelper.getUserId(token);
-
+        //获取userid
+        String userId = TokenUtil.getUserId(request);
         if (!redisTemplate.delete(userId+":"+userId)){
-            Asserts.fail("退出登录失败",201);
+            Asserts.fail(ResultCodeEnum.FAIL);
         }
-
-
     }
-
-
     @Override
     public User getUser(HttpServletRequest request) {
-        //获取token
-        String token = TokenUtil.getToken(request);
         //获取userid
-        String userId = JwtHelper.getUserId(token);
+        String userId = TokenUtil.getUserId(request);
         //先查询redis中是否存在该用户信息
         User user = JSON.parseObject((String)redisTemplate.opsForValue().get(userId+":"+"userInfo"), User.class);
-        if( user != null ) {
+        if( null != user ) {
             return user;
         }
         //根据userid查询用户信息
-         user = baseMapper.selectOne(new QueryWrapper<User>().eq("user_id", userId));
+         user = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
         if (user == null) {
             Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
         }
@@ -114,13 +106,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public Boolean uploadAvatar(MultipartFile file, HttpServletRequest request) {
-        //获取token
-        String token = TokenUtil.getToken(request);
         //获取userid
-        String userId = JwtHelper.getUserId(token);
+        String userId = TokenUtil.getUserId(request);
         //根据userid查询用户信息
-        User user = baseMapper.selectOne(new QueryWrapper<User>().eq("user_id", userId));
-        if (user == null) {
+        User user = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
+        if (null == user) {
             Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
         }
 
@@ -137,13 +127,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Boolean register(User user) {
         //根据userid查询用户信息
-        User user1 = baseMapper.selectOne(new QueryWrapper<User>().eq("user_id", user.getUserId()));
-        if (user1 != null) {
+        User userQuery = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, user.getUserId()));
+        if (null != userQuery) {
             Asserts.fail(ResultCodeEnum.USER_EXIST);
         } else {
-            user.setUserpho("http://106.53.124.182:9000/public/2022/07/24/969e3166-094c-445c-afba-c6c2cfa4ae23.jfif"); //默认头像
-            int insert = baseMapper.insert(user);
-            return insert > 0;
+            user.setUserpho(Consts.USER_DEFAULT_IMAGE); //默认头像
+            return baseMapper.insert(user) > 0;
         }
 
         return false;
@@ -151,14 +140,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public Boolean updatePassword(String oldPassword, String newPawssword, HttpServletRequest request) {
-        //查询redis中的token获取userId
-        String token = TokenUtil.getToken(request);
-        String userId = JwtHelper.getUserId(token);
-//        System.out.println("userId"+userId);
-
+        //获取userid
+        String userId = TokenUtil.getUserId(request);
             //根据userid查询用户信息
-        User user = baseMapper.selectOne(new QueryWrapper<User>().eq("user_id", userId));
-            if (user == null) {
+        User user = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
+            if (null == user) {
                 Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
             } else if (!user.getPassword().equals(oldPassword)) {
                 Asserts.fail(ResultCodeEnum.PASSWORD_ERROR);
@@ -169,7 +155,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 redisTemplate.opsForValue().set(userId+":"+"userInfo", JSON.toJSONString(user),30,TimeUnit.SECONDS);
                 return update > 0;
             }
-
         return false;
     }
 

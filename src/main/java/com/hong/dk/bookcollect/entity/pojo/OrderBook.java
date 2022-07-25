@@ -33,6 +33,4 @@ public class OrderBook extends BaseEntity {
     private Integer bookId;
 
 
-
-
 }

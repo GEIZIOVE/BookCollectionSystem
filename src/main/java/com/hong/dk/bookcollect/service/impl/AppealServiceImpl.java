@@ -1,6 +1,7 @@
 package com.hong.dk.bookcollect.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.hong.dk.bookcollect.config.MinioConfig;
 import com.hong.dk.bookcollect.entity.pojo.Appeal;
 import com.hong.dk.bookcollect.entity.pojo.User;
@@ -38,13 +39,13 @@ public class AppealServiceImpl extends ServiceImpl<AppealMapper, Appeal> impleme
     @Override
     public void resetPassword(MultipartFile file, String userId) {
         //根据userid查询用户信息
-        User user = userMapper.selectOne(new QueryWrapper<User>().eq("user_id", userId));
+        User user =  userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
         if (null == user) {
             Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
         }
 
         //查询appeal表中是否有该用户的申诉记录
-        Appeal appeal = baseMapper.selectOne(new QueryWrapper<Appeal>().eq("user_id", userId));
+        Appeal appeal =  baseMapper.selectOne(Wrappers.lambdaQuery(Appeal.class).eq(Appeal::getUserId, userId));
         if(null != appeal && appeal.getAuditStatus() == 0){
             Asserts.fail(ResultCodeEnum.APPEAL_ING);
         }
@@ -60,7 +61,5 @@ public class AppealServiceImpl extends ServiceImpl<AppealMapper, Appeal> impleme
         if (!(this.baseMapper.insert(appeal1) > 0)){
             Asserts.fail(ResultCodeEnum.FAIL);
         }
-
     }
-
 }

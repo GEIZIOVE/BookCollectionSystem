@@ -1,5 +1,6 @@
 package com.hong.dk.bookcollect.entity.pojo;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import com.hong.dk.bookcollect.entity.pojo.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -39,5 +40,5 @@ public class Order extends BaseEntity {
 
     @ApiModelProperty(value = "取书时间")
     @TableField("pick_time")
-    private LocalDateTime pickTime;
+    private DateTime pickTime;
 }
