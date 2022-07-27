@@ -3,8 +3,6 @@ package com.hong.dk.bookcollect.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hong.dk.bookcollect.entity.pojo.Order;
 import com.hong.dk.bookcollect.entity.pojo.vo.OrderVO;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +21,9 @@ public interface OrderService extends IService<Order> {
      * @param bookIdArray
      * @return
      */
-    Map<String,Object> saveOrder(String bookIdArray, HttpServletRequest request);
+    Map<String,Object> saveOrder(String bookIdArray, String userId);
 
     OrderVO getOrderById(String orderId);
 
-    List<OrderVO> getAllOrder(HttpServletRequest request);
+    List<OrderVO> getAllOrder(String userId);
 }

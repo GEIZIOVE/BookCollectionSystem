@@ -2,16 +2,23 @@ package com.hong.dk.bookcollect.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 //@EnableWebMvc
 public class AuthWebMvcConfig implements WebMvcConfigurer {
     @Autowired
     AuthHandlerInterceptor authHandlerInterceptor;
+
+    @Autowired
+    TokenToUserMethodArgumentResolver tokenToUserMethodArgumentResolver;
+
     /**
      * 给接口都配置拦截器,拦截转向到 authHandlerInterceptor
      */
@@ -26,6 +33,18 @@ public class AuthWebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/swagger-resources/**",
                         "/webjars/**", "/v2/**", "/swagger-ui.html/**");
     }
+
+
+    /**
+     * @param argumentResolvers
+     * @tip @TokenToMallUser @TokenToAdminUser 注解处理方法
+     */
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(tokenToUserMethodArgumentResolver);
+    }
+
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         //添加映射路径
@@ -42,4 +61,6 @@ public class AuthWebMvcConfig implements WebMvcConfigurer {
                 //暴露哪些原始请求头部信息
                 .exposedHeaders("*");
     }
+
+
 }

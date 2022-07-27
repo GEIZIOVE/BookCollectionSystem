@@ -1,7 +1,7 @@
 package com.hong.dk.bookcollect.entity.exception;
 
 
-import com.hong.dk.bookcollect.result.ResultCodeEnum;
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

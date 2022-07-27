@@ -1,7 +1,7 @@
 package com.hong.dk.bookcollect.handler;
 
 import com.hong.dk.bookcollect.entity.exception.BookCollectException;
-import com.hong.dk.bookcollect.result.ResultCodeEnum;
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 
 public class Asserts {
     public static void fail(String message,Integer code) {

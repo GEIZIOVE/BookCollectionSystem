@@ -2,7 +2,7 @@ package com.hong.dk.bookcollect.service;
 
 import com.hong.dk.bookcollect.entity.pojo.Book;
 import com.baomidou.mybatisplus.extension.service.IService;
-import javax.servlet.http.HttpServletRequest;
+
 import java.util.List;
 
 /**
@@ -15,11 +15,8 @@ import java.util.List;
  */
 public interface BookService extends IService<Book> {
 
-    List<Book> getBookRetention(HttpServletRequest request);
 
-    List<Book> getBookRetentionHasGet(HttpServletRequest request);
 
-    List<Book> getAllBook(HttpServletRequest request);
-
-    List<Book> getBookApproving(HttpServletRequest request);
+    List<Book> getAllBook(String userId);
+    List<Book> getBookList(Integer bookStatus, String userId);
 }

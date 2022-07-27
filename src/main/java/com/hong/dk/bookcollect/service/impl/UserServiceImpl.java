@@ -2,7 +2,6 @@ package com.hong.dk.bookcollect.service.impl;
 
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.dk.bookcollect.config.MinioConfig;
@@ -10,12 +9,11 @@ import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.handler.Asserts;
 import com.hong.dk.bookcollect.mapper.UserMapper;
 import com.hong.dk.bookcollect.result.Consts;
-import com.hong.dk.bookcollect.result.ResultCodeEnum;
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.service.UserService;
 import com.hong.dk.bookcollect.utils.*;
 import com.hong.dk.bookcollect.utils.helper.JwtHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,17 +76,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public void logout(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
+    public void logout(String userId) {
         if (!redisTemplate.delete(userId+":"+userId)){
             Asserts.fail(ResultCodeEnum.FAIL);
         }
     }
     @Override
-    public User getUser(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
+    public User getUser(String userId) {
+
         //先查询redis中是否存在该用户信息
         User user = JSON.parseObject((String)redisTemplate.opsForValue().get(userId+":"+"userInfo"), User.class);
         if( null != user ) {
@@ -105,9 +100,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Boolean uploadAvatar(MultipartFile file, HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
+    public Boolean uploadAvatar(MultipartFile file, String userId) {
         //根据userid查询用户信息
         User user = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
         if (null == user) {
@@ -139,9 +132,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Boolean updatePassword(String oldPassword, String newPawssword, HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
+    public Boolean updatePassword(String oldPassword, String newPawssword, String userId) {
             //根据userid查询用户信息
         User user = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
             if (null == user) {

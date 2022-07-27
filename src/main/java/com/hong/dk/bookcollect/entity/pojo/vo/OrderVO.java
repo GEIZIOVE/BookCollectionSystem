@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -25,7 +26,7 @@ public class OrderVO implements Serializable {
     private String userId;
 
     @ApiModelProperty(value = "订单提交时间")
-    private DateTime pickTime;
+    private LocalDateTime pickTime;
 
     @ApiModelProperty(value = "书籍列表")
     private List<Book> bookList;

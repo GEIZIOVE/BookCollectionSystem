@@ -1,6 +1,5 @@
 package com.hong.dk.bookcollect.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.hong.dk.bookcollect.config.MinioConfig;
 import com.hong.dk.bookcollect.entity.pojo.Appeal;
@@ -8,7 +7,7 @@ import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.handler.Asserts;
 import com.hong.dk.bookcollect.mapper.AppealMapper;
 import com.hong.dk.bookcollect.mapper.UserMapper;
-import com.hong.dk.bookcollect.result.ResultCodeEnum;
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.service.AppealService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.dk.bookcollect.utils.MinioUtil;

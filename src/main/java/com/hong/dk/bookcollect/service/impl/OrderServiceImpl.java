@@ -15,6 +15,9 @@ import com.hong.dk.bookcollect.handler.Asserts;
 import com.hong.dk.bookcollect.mapper.BookMapper;
 import com.hong.dk.bookcollect.mapper.OrderBookMapper;
 import com.hong.dk.bookcollect.mapper.OrderMapper;
+import com.hong.dk.bookcollect.result.enmu.BookStatusEnum;
+import com.hong.dk.bookcollect.result.enmu.OrderStatusEnum;
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.service.OrderService;
 import com.hong.dk.bookcollect.utils.OrderUtil;
 import com.hong.dk.bookcollect.utils.TokenUtil;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,16 +51,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     @Transactional
-    public Map<String,Object> saveOrder(String bookIdArray, HttpServletRequest request) {
+    public Map<String,Object> saveOrder(String bookIdArray, String userId) {
         Map<String,Object> map = new HashMap<>();
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
 
         //新建一个Order对象
         Order order = new Order();
         order.setUserId(userId.trim()); //设置userid
-        order.setStatus(0); //设置状态为0，即待审批
-        order.setPickTime(DateTime.now()); //设置取书时间为当前时间
+        order.setStatus(OrderStatusEnum.WAITING_GET.getOrderStatus()); //设置状态为0，即待审批
+        order.setPickTime(LocalDateTime.now()); //设置取书时间为当前时间
         order.setOrderId(OrderUtil.getOrderNo().trim()); //生成订单编号
         int i = baseMapper.insert(order);//插入数据库
         if (i > 0) {
@@ -72,17 +74,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
                 Book book = new Book();
                 book.setId(Integer.parseInt(bookId));
-                book.setPickStatus(2);  //设置书籍状态审批中
+                book.setPickStatus(BookStatusEnum.UNDER_APPROVAL.getBookStatus());  //设置书籍状态审批中
                 int flag2 = bookMapper.updateById(book);  //更新书籍状态为1，已借出
                 if (flag1 <= 0 && flag2 <= 0) {
                     Asserts.fail("插入失败", 201);
                 }
             }
             //删除redis中的相关缓存
-            redisTemplate.delete(  userId +":"+"retentionBookHasGet");
-            redisTemplate.delete( userId  +":"+ "retention0Book");
-            redisTemplate.delete( userId  +":"+ "allBook");
-            redisTemplate.delete( userId  +":"+ "approvingBook");
+            redisTemplate.delete(  userId +":"+"0");
+            redisTemplate.delete( userId  +":"+"1");
+            redisTemplate.delete( userId  +":"+"2");
 
 
             OrderVO orderVO = Optional.ofNullable(order).map(OrderVO::new).orElse(null); //map将order转换为orderVO
@@ -90,7 +91,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             map.put("order",orderVO);
             return map;
         }
-        Asserts.fail("插入失败", 201);
+        Asserts.fail(ResultCodeEnum.FAIL);
         return null;
     }
 
@@ -108,9 +109,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     @Override
-    public List<OrderVO> getAllOrder(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
+    public List<OrderVO> getAllOrder(String userId) {
 
         //根据userid查询所有订单信息
         LambdaQueryWrapper<Order> lambdaQueryWrapper = Wrappers.lambdaQuery(Order.class).eq(Order::getUserId,userId);

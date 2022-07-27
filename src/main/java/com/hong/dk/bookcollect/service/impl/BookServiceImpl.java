@@ -6,12 +6,10 @@ import com.hong.dk.bookcollect.entity.pojo.Book;
 import com.hong.dk.bookcollect.mapper.BookMapper;
 import com.hong.dk.bookcollect.service.BookService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hong.dk.bookcollect.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -30,51 +28,12 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
     private RedisTemplate<String,String> redisTemplate;
 
 
-    @Override
-    public List<Book> getBookRetention(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
-        //根据userid查询redis
-        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get( userId+":"+"retention0Book"), Book.class);
-        if (list != null) {
-            return list;
-        }
 
-        //根据userid查询用户所待取的书籍
-        List<Book> books =  baseMapper.selectList(Wrappers.lambdaQuery(Book.class).eq(Book::getUserId, userId).eq(Book::getPickStatus, 0));
-        //将书籍存入redis
-        if (books != null && books.size() > 0) {
-            redisTemplate.opsForValue().set(userId +":"+ "retention0Book", JSON.toJSONString(books), 20, TimeUnit.SECONDS
-            );
-        }
-        return books;
 
-    }
 
     @Override
-    public List<Book> getBookRetentionHasGet(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
-        //根据userid查询redis
-        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get( userId +":"+"retentionBookHasGet"), Book.class);
-        if (list != null) {
-            return list;
-        }
+    public List<Book> getAllBook(String userId) {
 
-        //根据userid查询用户所待取的书籍
-        List<Book> books =  baseMapper.selectList(Wrappers.lambdaQuery(Book.class).eq(Book::getUserId, userId).eq(Book::getPickStatus, 1));
-        //将书籍存入redis
-
-        if (books != null && books.size() > 0) {
-            redisTemplate.opsForValue().set( userId +":"+"retentionBookHasGet", JSON.toJSONString(books), 20, TimeUnit.SECONDS);
-        }
-        return books;
-    }
-
-    @Override
-    public List<Book> getAllBook(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
         //根据userid查询redis
         List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":"+ "allBook"), Book.class);
         if (list != null) {
@@ -89,20 +48,19 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
         return books;
     }
 
+
+
     @Override
-    public List<Book> getBookApproving(HttpServletRequest request) {
-        //获取userid
-        String userId = TokenUtil.getUserId(request);
-        //根据userid查询redis
-        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":"+ "approvingBook"), Book.class);
-        if (list != null) {
+    public List<Book> getBookList(Integer bookStatus, String userId) {
+        //根据userId查询redis
+        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":"+ bookStatus), Book.class);
+        if (null != list){
             return list;
         }
-
-        List<Book> books = baseMapper.selectList(Wrappers.lambdaQuery(Book.class).eq(Book::getUserId, userId).eq(Book::getPickStatus, 2));
+        List<Book> books = baseMapper.selectList(Wrappers.lambdaQuery(Book.class).eq(Book::getUserId, userId).eq(Book::getPickStatus, bookStatus));
         //将书籍存入redis
         if (books != null && books.size() > 0) {
-            redisTemplate.opsForValue().set(userId +":"+ "approvingBook", JSON.toJSONString(books), 20, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(userId +":"+ bookStatus, JSON.toJSONString(books), 20, TimeUnit.SECONDS);
         }
         return books;
     }

@@ -1,24 +1,15 @@
 package com.hong.dk.bookcollect.config;
 
-import com.google.common.base.Predicates;
+import com.hong.dk.bookcollect.entity.pojo.UserToken;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Profiles;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.Parameter;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,18 +30,21 @@ public class Swagger2Config {
         List<Parameter> pars = new ArrayList<Parameter>();
         tokenPar.name("token").description("令牌").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
         pars.add(tokenPar.build());
-        return new Docket(DocumentationType.SWAGGER_2) //
+
+        return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("郭浩")
                 .apiInfo(productApiInfo())
-                .useDefaultResponseMessages(false)
+                .ignoredParameterTypes(UserToken.class)
                 .select()
                 .apis(RequestHandlerSelectors.any()) // 对所有api进行监控
-                .paths(Predicates.not(PathSelectors.regex("/error.*")))// 错误路径不监控
+//                .paths()// 错误路径不监控  PathSelectors.regex("/error.*"))
                 .paths(PathSelectors.regex("/.*"))// 对根下所有路径进行监控
                 .build()
-                .globalOperationParameters(pars) ;// 增加全局参数
+                .useDefaultResponseMessages(false)
+                .globalOperationParameters(pars);
 
     }
+
     private ApiInfo productApiInfo(){ //创建API的基本信息，这些信息会在Swagger UI中进行显示。
         return new ApiInfoBuilder()
                 .title("接口---API文档")

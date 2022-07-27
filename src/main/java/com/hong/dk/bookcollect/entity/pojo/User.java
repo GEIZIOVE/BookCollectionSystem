@@ -35,15 +35,12 @@ public class User extends BaseEntity {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private String id;
 
-    @NotNull(message = "用户学工号不能为空")
-//    @Length(max = 12, message = "学号长度不能超过12")
     @ApiModelProperty(value = "学工号")
     @TableField("user_id")
     private String userId;
 
 
     @ApiModelProperty(value = "注册人")
-    @Size(max = 10, message = "姓名长度不能超过10")
     @TableField("register")
     private String register;
 

@@ -1,4 +1,4 @@
-package com.hong.dk.bookcollect.result;
+package com.hong.dk.bookcollect.result.enmu;
 
 import lombok.Getter;
 

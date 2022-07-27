@@ -1,5 +1,6 @@
 package com.hong.dk.bookcollect.result;
 
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

@@ -2,7 +2,11 @@ package com.hong.dk.bookcollect.controller;
 
 
 
+import com.hong.dk.bookcollect.entity.annotation.TokenToUser;
 import com.hong.dk.bookcollect.entity.pojo.User;
+import com.hong.dk.bookcollect.entity.pojo.UserToken;
+import com.hong.dk.bookcollect.entity.pojo.param.UpdateUserPasswordParam;
+import com.hong.dk.bookcollect.entity.pojo.param.UserLoginParam;
 import com.hong.dk.bookcollect.result.Result;
 import com.hong.dk.bookcollect.service.UserService;
 import io.swagger.annotations.Api;
@@ -10,14 +14,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,15 +38,15 @@ public class UserController {
 
     @ApiOperation("用户登录")
     @PostMapping("/login")
-    public Result login(@ApiParam("用户学工号") @RequestParam("userid") String userId,@ApiParam("密码") @RequestParam("password") String password) {
-        Map<String, Object> map = userService.login(userId, password);
+    public Result login(@RequestBody @Valid UserLoginParam userLoginParam, BindingResult result) {
+        Map<String, Object> map = userService.login(userLoginParam.getUserId(), userLoginParam.getPassword());
         return Result.ok(map);
     }
 
     @ApiOperation("退出登录")
     @PostMapping("/logout")
-    public Result logout(HttpServletRequest request) {
-         userService.logout(request);
+    public Result logout(@TokenToUser UserToken user) {
+         userService.logout(user.getUserId());
          return Result.ok();
 
 
@@ -53,18 +54,8 @@ public class UserController {
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public Result register(@Validated @RequestBody User user, BindingResult result ) {
-        //判断是否有error
-        if (result.hasErrors()) {
-            //获取全局与属性的错误
-            //result.getAllErrors();
-            //只获取属性校验的错误
-            Map<String, Object> map = new HashMap<>();
-            for (FieldError fieldError : result.getFieldErrors()) {
-                map.put("msg", fieldError.getDefaultMessage());
-            }
-            return Result.fail(map);
-        }
+    public Result register( @RequestBody User user) {
+
         Boolean flag = userService.register(user);
         if (flag) {
             return Result.ok("注册成功");
@@ -75,11 +66,8 @@ public class UserController {
 
     @ApiOperation("修改密码")
     @PostMapping("/updatePassword/{oldPassword}/{newPawssword}")
-    public Result<String> updatePassword (@ApiParam("原密码") @PathVariable String oldPassword,
-                                           @ApiParam("新密码")  @PathVariable String newPawssword,
-                                             HttpServletRequest request) {
-
-        Boolean flag = userService.updatePassword(oldPassword, newPawssword,request);
+    public Result<String> updatePassword (@RequestBody @Valid UpdateUserPasswordParam userPasswordParam,@TokenToUser UserToken user) {
+        Boolean flag = userService.updatePassword(userPasswordParam.getOriginalPassword(),userPasswordParam.getNewPassword(), user.getUserId());
         if (flag) {
             return Result.ok("修改成功");
         } else {
@@ -91,8 +79,8 @@ public class UserController {
     @ApiOperation("用户上传头像")
     @PostMapping("/uploadAvatar")
 public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFile file,
-                               HttpServletRequest request) {
-        Boolean flag = userService.uploadAvatar(file, request);
+                           @TokenToUser UserToken user) {
+        Boolean flag = userService.uploadAvatar(file, user.getUserId());
         if (flag) {
             return Result.ok("上传成功");
         } else {
@@ -102,9 +90,10 @@ public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFi
 
     @ApiOperation("获取用户信息")
     @GetMapping("/getUser")
-    public Result<User> getUser(HttpServletRequest request) {
-        User user = userService.getUser(request);
-        return Result.ok(user);
+    public Result<User> getUser(@TokenToUser UserToken user) {
+
+        return Result.ok( userService.getUser(user.getUserId()));
+
     }
 
 

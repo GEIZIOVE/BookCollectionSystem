@@ -1,8 +1,7 @@
 package com.hong.dk.bookcollect.filter;
 
 import com.hong.dk.bookcollect.handler.Asserts;
-import com.hong.dk.bookcollect.result.ResultCodeEnum;
-
+import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.utils.helper.JwtHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
-
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -32,6 +29,7 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest httpServletRequest,
                              HttpServletResponse httpServletResponse,
                              @Qualifier("jacksonObjectMapper") Object object) throws Exception {
+
 //        log.info("=======进入拦截器========");
         // 如果不是映射到方法直接通过,可以访问资源.
         if (!(object instanceof HandlerMethod)) {
@@ -39,6 +37,7 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
         }
         //为空就返回错误
         String token = httpServletRequest.getHeader("token");
+        System.out.println(token);
         if (null == token || "".equals(token.trim())) {
             Asserts.fail(ResultCodeEnum.LOGIN_AUTH);
         }

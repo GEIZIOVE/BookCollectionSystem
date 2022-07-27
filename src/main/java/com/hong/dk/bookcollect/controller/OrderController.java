@@ -1,6 +1,8 @@
 package com.hong.dk.bookcollect.controller;
 
 
+import com.hong.dk.bookcollect.entity.annotation.TokenToUser;
+import com.hong.dk.bookcollect.entity.pojo.UserToken;
 import com.hong.dk.bookcollect.result.Result;
 import com.hong.dk.bookcollect.service.OrderService;
 import io.swagger.annotations.Api;
@@ -9,7 +11,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -29,9 +30,9 @@ public class OrderController {
 
     @ApiOperation(value = "生成订单信息")
     @PostMapping("/saveOrder")
-    public Result saveOrder(@ApiParam("书籍id集合") @RequestParam String bookIdArray, HttpServletRequest request) {
+    public Result saveOrder(@ApiParam("书籍id集合") @RequestParam String bookIdArray, @TokenToUser UserToken user) {
 
-        return Result.ok(orderService.saveOrder(bookIdArray,request));
+        return Result.ok(orderService.saveOrder(bookIdArray,user.getUserId()));
     }
 
     @ApiOperation(value = "根据orderId获取订单信息")
@@ -42,8 +43,8 @@ public class OrderController {
 
     @ApiOperation(value = "获取所有订单信息")
     @GetMapping("/getAllOrder")
-    public Result getAllOrder(HttpServletRequest request) {
-        return Result.ok(orderService.getAllOrder(request));
+    public Result getAllOrder(@TokenToUser UserToken user) {
+        return Result.ok(orderService.getAllOrder(user.getUserId()));
     }
 
 

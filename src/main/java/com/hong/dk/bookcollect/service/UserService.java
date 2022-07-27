@@ -3,9 +3,6 @@ package com.hong.dk.bookcollect.service;
 import com.hong.dk.bookcollect.entity.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
-
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -42,13 +39,13 @@ public interface UserService extends IService<User> {
      * @param newPawssword
      * @return
      */
-    Boolean updatePassword(String oldPassword, String newPawssword, HttpServletRequest request);
+    Boolean updatePassword(String oldPassword, String newPawssword, String userId);
 
 
-    void logout(HttpServletRequest request);
+    void logout(String userId);
 
 
-    User getUser(HttpServletRequest request);
+    User getUser(String userId);
 
-    Boolean uploadAvatar(MultipartFile file, HttpServletRequest request);
+    Boolean uploadAvatar(MultipartFile file, String userId);
 }
