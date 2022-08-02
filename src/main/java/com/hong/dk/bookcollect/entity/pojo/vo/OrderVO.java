@@ -1,6 +1,7 @@
 package com.hong.dk.bookcollect.entity.pojo.vo;
 
 import cn.hutool.core.date.DateTime;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.hong.dk.bookcollect.entity.pojo.Book;
 import com.hong.dk.bookcollect.entity.pojo.Order;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,10 +32,14 @@ public class OrderVO implements Serializable {
     @ApiModelProperty(value = "书籍列表")
     private List<Book> bookList;
 
+    @ApiModelProperty(value = "取件码")
+    private String pickCode;
+
     public OrderVO(Order order) {
         this.orderId = order.getOrderId();
         this.status = order.getStatus();
         this.userId = order.getUserId();
         this.pickTime = order.getPickTime();
+        this.pickCode = order.getPickCode();
     }
 }

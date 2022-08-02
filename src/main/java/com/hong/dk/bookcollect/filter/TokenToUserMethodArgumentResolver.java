@@ -17,6 +17,7 @@ import com.hong.dk.bookcollect.mapper.UserMapper;
 import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.utils.helper.JwtHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -38,19 +39,15 @@ public class TokenToUserMethodArgumentResolver implements HandlerMethodArgumentR
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        if (parameter.hasParameterAnnotation(TokenToUser.class)) {
-            return true;
-        }
-        return false;
+        return parameter.hasParameterAnnotation(TokenToUser.class);
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(@NotNull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 //        log.info("=======进入啊啊哈哈哈========");
-        User user = null;
         String token = webRequest.getHeader("token");
         String userId = JwtHelper.getUserId(token);
-        user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
+        User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
         if (null != user){
             UserToken userToken = new UserToken();
             userToken.setToken(token);

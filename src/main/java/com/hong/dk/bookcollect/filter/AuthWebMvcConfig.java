@@ -4,20 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 @Configuration
-//@EnableWebMvc
 public class AuthWebMvcConfig implements WebMvcConfigurer {
     @Autowired
     AuthHandlerInterceptor authHandlerInterceptor;
 
     @Autowired
     TokenToUserMethodArgumentResolver tokenToUserMethodArgumentResolver;
+
+    @Autowired
+    WebSecurityInterceptor webSecurityInterceptor;
 
     /**
      * 给接口都配置拦截器,拦截转向到 authHandlerInterceptor
@@ -29,9 +30,12 @@ public class AuthWebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/user/login")   //放行登录地址
                 .excludePathPatterns("/user/register")  //放行注册地址
                 .excludePathPatterns("/appeal/resetPassword")   //放行重置密码地址
+                .excludePathPatterns("/user/code")   //放行发送邮箱地址
                 //放行swagger
                 .excludePathPatterns("/swagger-resources/**",
                         "/webjars/**", "/v2/**", "/swagger-ui.html/**");
+        registry.addInterceptor(webSecurityInterceptor)
+                .addPathPatterns("/**") ;// 拦截所有请求
     }
 
 

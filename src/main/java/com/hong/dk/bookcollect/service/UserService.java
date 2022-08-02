@@ -2,6 +2,8 @@ package com.hong.dk.bookcollect.service;
 
 import com.hong.dk.bookcollect.entity.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hong.dk.bookcollect.entity.pojo.param.UserRegisterParam;
+import com.hong.dk.bookcollect.entity.pojo.vo.UserVO;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
@@ -27,10 +29,10 @@ public interface UserService extends IService<User> {
     /**
      * 用户注册
      *
-     * @param user
+     * @param userRegisterParam
      * @return
      */
-    Boolean register(User user);
+    Boolean register(UserRegisterParam userRegisterParam);
 
     /**
      * 修改密码
@@ -45,7 +47,9 @@ public interface UserService extends IService<User> {
     void logout(String userId);
 
 
-    User getUser(String userId);
+    UserVO getUser(String userId);
 
     Boolean uploadAvatar(MultipartFile file, String userId);
+
+    void sendCode(String email);
 }

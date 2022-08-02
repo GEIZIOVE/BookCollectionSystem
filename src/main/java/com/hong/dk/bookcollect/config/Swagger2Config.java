@@ -9,7 +9,8 @@ import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * Swagger2配置信息
  */
 @Configuration
-@EnableSwagger2
+@EnableSwagger2WebMvc
 @ConditionalOnProperty(prefix = "spring.profiles", name = "active", havingValue = "dev")
 public class Swagger2Config {
 
@@ -36,7 +37,7 @@ public class Swagger2Config {
                 .apiInfo(productApiInfo())
                 .ignoredParameterTypes(UserToken.class)
                 .select()
-                .apis(RequestHandlerSelectors.any()) // 对所有api进行监控
+                .apis(RequestHandlerSelectors.basePackage("com.hong.dk.bookcollect")) // 对所有api进行监控
 //                .paths()// 错误路径不监控  PathSelectors.regex("/error.*"))
                 .paths(PathSelectors.regex("/.*"))// 对根下所有路径进行监控
                 .build()

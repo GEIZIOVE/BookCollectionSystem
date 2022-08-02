@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import com.hong.dk.bookcollect.entity.pojo.base.BaseEntity;
+import com.hong.dk.bookcollect.entity.pojo.param.UserRegisterParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,6 +32,7 @@ import javax.validation.constraints.Size;
 public class User extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
+
     @ApiModelProperty(value = "ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private String id;
@@ -44,6 +46,9 @@ public class User extends BaseEntity {
     @TableField("register")
     private String register;
 
+    @ApiModelProperty(value = "邮箱")
+    @TableField("email")
+    private String email;
 
     @ApiModelProperty(value = "联系方式")
     @TableField("phone")

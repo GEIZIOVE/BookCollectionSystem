@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>验证码</title>
+</head>
+<style>
+  div{
+    font-size: 30px;
+  }
+</style>
+<body>
+<div>
+  <p>您正在注册西南石油大学书籍收发平台账号，验证码是：<a href="#" th:text="${code}"></a>，10分钟内有效，请及时输入。
+
+
+  </p>
+
+</div>
+<div style="font-size: 15px;color: #747474">如果您没有进行上述操作，请忽略此邮件。</div>
+
+
+</body>
+</html>

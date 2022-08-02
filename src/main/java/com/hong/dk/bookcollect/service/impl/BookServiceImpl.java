@@ -28,9 +28,6 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
     private RedisTemplate<String,String> redisTemplate;
 
 
-
-
-
     @Override
     public List<Book> getAllBook(String userId) {
 

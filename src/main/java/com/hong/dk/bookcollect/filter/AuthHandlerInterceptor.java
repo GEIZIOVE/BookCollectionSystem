@@ -28,16 +28,17 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest,
                              HttpServletResponse httpServletResponse,
-                             @Qualifier("jacksonObjectMapper") Object object) throws Exception {
+                             @Qualifier("jacksonObjectMapper") Object object) {
 
-//        log.info("=======进入拦截器========");
+
         // 如果不是映射到方法直接通过,可以访问资源.
         if (!(object instanceof HandlerMethod)) {
             return true;
         }
+//        log.info("=======进入拦截器========");
         //为空就返回错误
         String token = httpServletRequest.getHeader("token");
-        System.out.println(token);
+//        System.out.println(token);
         if (null == token || "".equals(token.trim())) {
             Asserts.fail(ResultCodeEnum.LOGIN_AUTH);
         }

@@ -1,19 +1,20 @@
 package com.hong.dk.bookcollect.controller;
 
-
-
+import com.hong.dk.bookcollect.entity.annotation.AccessLimit;
 import com.hong.dk.bookcollect.entity.annotation.TokenToUser;
-import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.entity.pojo.UserToken;
 import com.hong.dk.bookcollect.entity.pojo.param.UpdateUserPasswordParam;
 import com.hong.dk.bookcollect.entity.pojo.param.UserLoginParam;
+import com.hong.dk.bookcollect.entity.pojo.param.UserRegisterParam;
+import com.hong.dk.bookcollect.entity.pojo.vo.UserVO;
 import com.hong.dk.bookcollect.result.Result;
 import com.hong.dk.bookcollect.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,13 +33,13 @@ import java.util.Map;
 @Api(value = "用户表(user)接口", tags = "用户表(user)接口")
 @RestController
 @RequestMapping("/user")
+
 public class UserController {
     @Autowired
     private UserService userService;
-
     @ApiOperation("用户登录")
     @PostMapping("/login")
-    public Result login(@RequestBody @Valid UserLoginParam userLoginParam, BindingResult result) {
+    public Result login(@RequestBody @Valid UserLoginParam userLoginParam) {//, BindingResult bindingResult
         Map<String, Object> map = userService.login(userLoginParam.getUserId(), userLoginParam.getPassword());
         return Result.ok(map);
     }
@@ -54,9 +55,9 @@ public class UserController {
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public Result register( @RequestBody User user) {
+    public Result register(@RequestBody @Valid UserRegisterParam userRegisterParam) {
 
-        Boolean flag = userService.register(user);
+        Boolean flag = userService.register(userRegisterParam);
         if (flag) {
             return Result.ok("注册成功");
         } else {
@@ -90,10 +91,24 @@ public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFi
 
     @ApiOperation("获取用户信息")
     @GetMapping("/getUser")
-    public Result<User> getUser(@TokenToUser UserToken user) {
+    public Result<UserVO> getUser(@TokenToUser UserToken user) {
 
-        return Result.ok( userService.getUser(user.getUserId()));
+        return Result.ok(userService.getUser(user.getUserId()));
+    }
 
+    /**
+     * 发送邮箱验证码
+     *
+     * @param email 用户名
+     * @return {@link Result<>}
+     */
+    @AccessLimit(seconds = 60, maxCount = 1)
+    @ApiOperation(value = "发送邮箱验证码")
+    @ApiImplicitParam(name = "email", value = "用户邮箱", required = true, dataType = "String")
+    @GetMapping("/code")
+    public Result<?> sendCode(String email) {
+        userService.sendCode(email);
+        return Result.ok();
     }
 
 

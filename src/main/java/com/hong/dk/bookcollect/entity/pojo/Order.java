@@ -41,4 +41,8 @@ public class Order extends BaseEntity {
     @ApiModelProperty(value = "取书时间")
     @TableField("pick_time")
     private LocalDateTime pickTime;
+
+    @ApiModelProperty(value = "取件码")
+    @TableField("pick_code")
+    private String pickCode;
 }

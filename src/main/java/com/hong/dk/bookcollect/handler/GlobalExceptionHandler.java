@@ -6,31 +6,73 @@ import com.hong.dk.bookcollect.entity.exception.BookCollectException;
 import com.hong.dk.bookcollect.result.Result;
 import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Objects;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 
 /**
  * 全局异常处理类
  * @author wqh
  */
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * 处理ConstraintViolationException异常
+     * @param e
+     * @return
+     */
+    @ResponseBody
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public Result constraintViolationExceptionHandler(ConstraintViolationException e) {
+//        log.debug("[constraintViolationExceptionHandler]", ex);
+        // 拼接错误
+        StringBuilder detailMessage = new StringBuilder();
+        for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
+            // 使用 ; 分隔多个错误
+            if (detailMessage.length() > 0) {
+                detailMessage.append(";");
+            }
+            // 拼接内容到其中
+            detailMessage.append(constraintViolation.getMessage());
+        }
+        // 包装 CommonResult 结果
+        return Result.build(ResultCodeEnum.PARAM_ERROR.getCode(),
+                ResultCodeEnum.PARAM_ERROR.getMessage() + ":" + detailMessage.toString());
+    }
     /**
      * 处理BindException异常
      * @param e
      * @return
      */
     @ExceptionHandler(BindException.class) // 处理参数校验异常
+    @ResponseBody
     public Result bindException(BindException e) {
-        BindingResult bindingResult = e.getBindingResult(); // 获取参数校验结果
-        return Result.build(510, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+//        log.info("BindException异常:{}", e.getMessage());
+        // 拼接错误
+        StringBuilder detailMessage = new StringBuilder();
+        for (ObjectError objectError : e.getAllErrors()) {
+            // 使用 ; 分隔多个错误
+            if (detailMessage.length() > 0) {
+                detailMessage.append(";");
+            }
+            // 拼接内容到其中
+            detailMessage.append(objectError.getDefaultMessage());
+        }
+        // 包装 CommonResult 结果
+        return Result.build(ResultCodeEnum.PARAM_ERROR.getCode(),
+                ResultCodeEnum.PARAM_ERROR.getMessage() + ":" + detailMessage.toString());
     }
 
     /**
@@ -39,9 +81,18 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(MethodArgumentNotValidException.class) // 方法参数校验异常
+    @ResponseBody
     public Result bindException(MethodArgumentNotValidException e) {
-        BindingResult bindingResult = e.getBindingResult();
-        return Result.build(510, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+//        log.info("MethodArgumentNotValidException异常:{}", e.getMessage());
+        BindingResult bindingResult = e.getBindingResult(); // 获取BindingResult
+        String message = null;
+        if (bindingResult.hasErrors()) { // 判断BindingResult是否有错误
+            FieldError fieldError = bindingResult.getFieldError(); // 获取错误信息
+            if (fieldError != null) {
+                message = fieldError.getField()+fieldError.getDefaultMessage();
+            }
+        }
+        return Result.fail(message);
     }
 
     /**
@@ -79,7 +130,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result error(Exception e) {
         e.printStackTrace();
-        return Result.fail();
+        return Result.fail(e.getMessage());
     }
 
 
