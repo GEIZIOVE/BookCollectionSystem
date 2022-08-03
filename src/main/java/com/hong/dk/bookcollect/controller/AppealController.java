@@ -2,6 +2,7 @@ package com.hong.dk.bookcollect.controller;
 
 
 
+import com.hong.dk.bookcollect.entity.annotation.OptLog;
 import com.hong.dk.bookcollect.result.Result;
 import com.hong.dk.bookcollect.service.AppealService;
 import io.swagger.annotations.Api;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import static com.hong.dk.bookcollect.entity.annotation.OptTypeConst.UPLOAD;
 
 /**
  * <p>
@@ -31,7 +34,9 @@ public class AppealController {
     @Autowired
     private AppealService appealService;
 
+
     @ApiOperation("登录页面重置密码")
+    @OptLog(optType = UPLOAD)
     @PostMapping("/resetPassword")
     public Result resetPassword(@ApiParam("学生一卡通图片") @RequestParam("file") MultipartFile file
             , @ApiParam("学工号") @RequestParam("userid") String userId) {

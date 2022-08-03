@@ -136,7 +136,7 @@ public class MinioUtil {
      */
     public String preview(String fileName){
         // 查看文件地址
-        GetPresignedObjectUrlArgs build = new GetPresignedObjectUrlArgs().builder()
+        GetPresignedObjectUrlArgs build =  new GetPresignedObjectUrlArgs().builder()
                 .bucket(prop.getBucketName())
                 .object(fileName) //obejct方法是获取文件地址的方法
                 .method(Method.GET)

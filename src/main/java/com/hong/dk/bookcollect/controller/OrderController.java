@@ -1,6 +1,7 @@
 package com.hong.dk.bookcollect.controller;
 
 
+import com.hong.dk.bookcollect.entity.annotation.OptLog;
 import com.hong.dk.bookcollect.entity.annotation.TokenToUser;
 import com.hong.dk.bookcollect.entity.pojo.UserToken;
 import com.hong.dk.bookcollect.result.Result;
@@ -10,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import static com.hong.dk.bookcollect.entity.annotation.OptTypeConst.SAVE;
 
 
 /**
@@ -29,6 +32,7 @@ public class OrderController {
     private OrderService orderService;
 
     @ApiOperation(value = "生成订单信息")
+    @OptLog(optType = SAVE)
     @PostMapping("/saveOrder")
     public Result saveOrder(@ApiParam("书籍id集合") @RequestParam String bookIdArray, @TokenToUser UserToken user) {
 

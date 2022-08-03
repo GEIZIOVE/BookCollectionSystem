@@ -28,8 +28,7 @@ public class Book extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "ID")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private String id;
 
     @ApiModelProperty(value = "书籍名称")
     private String bookName;

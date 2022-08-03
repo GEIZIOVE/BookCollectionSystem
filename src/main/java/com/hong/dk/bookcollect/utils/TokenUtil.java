@@ -4,13 +4,8 @@ import com.hong.dk.bookcollect.utils.helper.JwtHelper;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 
-import java.util.Enumeration;
-import java.util.List;
-
 
 public class TokenUtil {
-
-
 
     /**
      * 获取token
@@ -24,7 +19,6 @@ public class TokenUtil {
         return token;
 
     }
-
     /**
      * 获取当前登录用户id
      * @param request

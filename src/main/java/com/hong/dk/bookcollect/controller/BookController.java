@@ -42,7 +42,6 @@ public Result list(@RequestParam(required = false) @ApiParam(value = "取件状�
     }
 
 
-
     @ApiOperation("查询所有书籍")
     @GetMapping("/getAllBook")
     public Result getAllBook(@TokenToUser UserToken user) {

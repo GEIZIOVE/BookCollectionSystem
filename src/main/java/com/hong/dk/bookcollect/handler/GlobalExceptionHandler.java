@@ -130,7 +130,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result error(Exception e) {
         e.printStackTrace();
-        return Result.fail(e.getMessage());
+        return Result.fail("技术问题，请再次刷新页面或联系相关技术人员");
+//        return Result.fail(e.getMessage());
     }
 
 

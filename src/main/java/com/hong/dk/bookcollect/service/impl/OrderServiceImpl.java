@@ -1,10 +1,6 @@
 package com.hong.dk.bookcollect.service.impl;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.dk.bookcollect.entity.pojo.Book;
@@ -20,13 +16,12 @@ import com.hong.dk.bookcollect.result.enmu.OrderStatusEnum;
 import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.service.OrderService;
 import com.hong.dk.bookcollect.utils.OrderUtil;
-import com.hong.dk.bookcollect.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,11 +64,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             for (String bookId : bookIds) {
                 OrderBook orderBook = new OrderBook();//新建一个OrderBook对象
                 orderBook.setOrderId(orderId);//设置订单id
-                orderBook.setBookId(Integer.parseInt(bookId));//设置书籍id
+                orderBook.setBookId(bookId);//设置书籍id
                 int flag1 = orderBookMapper.insert(orderBook);//插入数据库
 
                 Book book = new Book();
-                book.setId(Integer.parseInt(bookId));
+                book.setId(bookId);
                 book.setPickStatus(BookStatusEnum.UNDER_APPROVAL.getBookStatus());  //设置书籍状态审批中
                 int flag2 = bookMapper.updateById(book);  //更新书籍状态为1，已借出
                 if (flag1 <= 0 && flag2 <= 0) {

@@ -1,6 +1,7 @@
 package com.hong.dk.bookcollect.controller;
 
 import com.hong.dk.bookcollect.entity.annotation.AccessLimit;
+import com.hong.dk.bookcollect.entity.annotation.OptLog;
 import com.hong.dk.bookcollect.entity.annotation.TokenToUser;
 import com.hong.dk.bookcollect.entity.pojo.UserToken;
 import com.hong.dk.bookcollect.entity.pojo.param.UpdateUserPasswordParam;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 
 import java.util.Map;
+
+import static com.hong.dk.bookcollect.entity.annotation.OptTypeConst.*;
 
 /**
  * <p>
@@ -66,7 +69,8 @@ public class UserController {
     }
 
     @ApiOperation("修改密码")
-    @PostMapping("/updatePassword/{oldPassword}/{newPawssword}")
+    @OptLog(optType = SAVE_OR_UPDATE)
+    @PostMapping("/updatePassword")
     public Result<String> updatePassword (@RequestBody @Valid UpdateUserPasswordParam userPasswordParam,@TokenToUser UserToken user) {
         Boolean flag = userService.updatePassword(userPasswordParam.getOriginalPassword(),userPasswordParam.getNewPassword(), user.getUserId());
         if (flag) {
@@ -78,6 +82,7 @@ public class UserController {
     }
 
     @ApiOperation("用户上传头像")
+    @OptLog(optType = UPLOAD)
     @PostMapping("/uploadAvatar")
 public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFile file,
                            @TokenToUser UserToken user) {
@@ -110,10 +115,6 @@ public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFi
         userService.sendCode(email);
         return Result.ok();
     }
-
-
-
-
 
 }
 
