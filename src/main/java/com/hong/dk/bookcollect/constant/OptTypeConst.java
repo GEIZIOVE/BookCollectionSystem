@@ -1,4 +1,4 @@
-package com.hong.dk.bookcollect.entity.annotation;
+package com.hong.dk.bookcollect.constant;
 
 /**
  * 操作日志类型常量

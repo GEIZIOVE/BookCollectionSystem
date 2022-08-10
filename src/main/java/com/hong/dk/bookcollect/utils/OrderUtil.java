@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Random;
 
 public class OrderUtil {
-
     /**
      * 获取订单号
      * @return String

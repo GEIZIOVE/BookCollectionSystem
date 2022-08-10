@@ -26,16 +26,16 @@ public class AuthWebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authHandlerInterceptor)
-                .addPathPatterns("/**") // 拦截所有请求
-                .excludePathPatterns("/user/login")   //放行登录地址
-                .excludePathPatterns("/user/register")  //放行注册地址
-                .excludePathPatterns("/appeal/resetPassword")   //放行重置密码地址
+                .addPathPatterns("/**")
+                .excludePathPatterns("/user/login")
+                .excludePathPatterns("/user/register")
+                .excludePathPatterns("/appeal/resetPassword")
                 .excludePathPatterns("/user/code")   //放行发送邮箱地址
                 //放行swagger
                 .excludePathPatterns("/swagger-resources/**",
                         "/webjars/**", "/v2/**", "/swagger-ui.html/**");
         registry.addInterceptor(webSecurityInterceptor)
-                .addPathPatterns("/**") ;// 拦截所有请求
+                .addPathPatterns("/**") ;
     }
 
 

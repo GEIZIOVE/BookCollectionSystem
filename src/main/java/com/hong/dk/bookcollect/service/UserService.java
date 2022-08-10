@@ -19,10 +19,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 用户登录
-     *
-     * @param userId
-     * @param password
-     * @return
+     * @return Map<String, Object>
      */
     Map<String,Object> login(String userId, String password);
 
@@ -32,7 +29,7 @@ public interface UserService extends IService<User> {
      * @param userRegisterParam
      * @return
      */
-    Boolean register(UserRegisterParam userRegisterParam);
+    void register(UserRegisterParam userRegisterParam);
 
     /**
      * 修改密码

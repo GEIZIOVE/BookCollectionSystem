@@ -1,9 +1,7 @@
 package com.hong.dk.bookcollect.utils;
 
 import com.hong.dk.bookcollect.entity.pojo.param.UserThreadParam;
-
 import java.util.Objects;
-
 /**
  *
  *

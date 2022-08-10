@@ -15,10 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface AppealService extends IService<Appeal> {
     /**
      * 登录页面重置密码
-     *
-     * @param file
-     * @param userId
-     * @return
      */
     void resetPassword(MultipartFile file, String userId);
 

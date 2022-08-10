@@ -2,23 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hong.dk.bookcollect.mapper.BookMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hong.dk.bookcollect.entity.pojo.Book">
-        <id column="id" property="id" />
-        <result column="book_name" property="bookName" />
-        <result column="periods" property="periods" />
-        <result column="isbn" property="isbn" />
-        <result column="book_photo" property="bookPhoto" />
-        <result column="book_number" property="bookNumber" />
-        <result column="put_time" property="putTime" />
-        <result column="number" property="number" />
-        <result column="pick_status" property="pickStatus" />
-        <result column="userid" property="userid" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
-        <result column="version" property="version" />
-        <result column="is_delete" property="isDelete" />
-        <result column="pick_time" property="pickTime" />
-    </resultMap>
+
 
 </mapper>

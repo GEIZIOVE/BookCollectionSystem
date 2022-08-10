@@ -1,5 +1,6 @@
 package com.hong.dk.bookcollect.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +17,7 @@ import com.hong.dk.bookcollect.result.enmu.OrderStatusEnum;
 import com.hong.dk.bookcollect.result.enmu.ResultCodeEnum;
 import com.hong.dk.bookcollect.service.OrderService;
 import com.hong.dk.bookcollect.utils.OrderUtil;
+import com.hong.dk.bookcollect.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -40,9 +43,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
     @Autowired
-    OrderBookMapper orderBookMapper;
+    private OrderBookMapper orderBookMapper;
     @Autowired
-    BookMapper bookMapper;
+    private BookMapper bookMapper;
+    
+
 
     @Override
     @Transactional
@@ -61,27 +66,29 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             String orderId = order.getOrderId();
             //获取书籍id数组
             String[] bookIds = bookIdArray.split(",");
+            //判断order_book表是否存在这些书籍
+            List<OrderBook> books = orderBookMapper.selectList(Wrappers.<OrderBook>lambdaQuery().in(OrderBook::getBookId, bookIds));
+            if (books.size() > 0) {
+                Asserts.fail("书籍重复提交",201);
+            }
             for (String bookId : bookIds) {
                 OrderBook orderBook = new OrderBook();//新建一个OrderBook对象
-                orderBook.setOrderId(orderId);//设置订单id
-                orderBook.setBookId(bookId);//设置书籍id
+                orderBook.setOrderId(orderId);
+                orderBook.setBookId(bookId);
                 int flag1 = orderBookMapper.insert(orderBook);//插入数据库
-
                 Book book = new Book();
                 book.setId(bookId);
                 book.setPickStatus(BookStatusEnum.UNDER_APPROVAL.getBookStatus());  //设置书籍状态审批中
                 int flag2 = bookMapper.updateById(book);  //更新书籍状态为1，已借出
-                if (flag1 <= 0 && flag2 <= 0) {
+                if (flag1 <= 0 || flag2 <= 0) {
                     Asserts.fail("插入失败", 201);
                 }
             }
-            //删除redis中的相关缓存
-            redisTemplate.delete(  userId +":"+"0");
-            redisTemplate.delete( userId  +":"+"1");
-            redisTemplate.delete( userId  +":"+"2");
+            String key = userId+":book:*";
+            redisTemplate.delete(key);
 
 
-            OrderVO orderVO = Optional.ofNullable(order).map(OrderVO::new).orElse(null); //map将order转换为orderVO
+            OrderVO orderVO = Optional.of(order).map(OrderVO::new).orElse(null); //map将order转换为orderVO
             map.put("msg","提交成功");
             map.put("order",orderVO);
             return map;
@@ -92,14 +99,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public OrderVO getOrderById(String orderId) {
-
+        //先查询redis中是否存在
+        OrderVO orderVO_Redis = JSON.parseObject(redisTemplate.opsForValue().get(UserUtil.getUserId()+":order:"+orderId), OrderVO.class);
+        if (null != orderVO_Redis) {
+            return orderVO_Redis;
+        }
         //根据订单id查询订单信息
         Order order = baseMapper.selectById(orderId);
         if(order == null){
             Asserts.fail("订单不存在",201);
         }
-        OrderVO orderVO = Optional.ofNullable(order).map(OrderVO::new).orElse(null); //map将order转换为orderVO
-        Optional.ofNullable(orderVO).ifPresent(this::addBookList);
+        OrderVO orderVO = Optional.of(order).map(OrderVO::new).orElse(null); //map将order转换为orderVO
+        Optional.of(orderVO).ifPresent(this::addBookList);
+        //存入redis中
+        redisTemplate.opsForValue().set(order.getUserId()+":order:"+orderId, JSON.toJSONString(orderVO),60, TimeUnit.SECONDS);
         return orderVO;
     }
 
@@ -109,11 +122,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         //根据userid查询所有订单信息
         LambdaQueryWrapper<Order> lambdaQueryWrapper = Wrappers.lambdaQuery(Order.class).eq(Order::getUserId,userId);
         List<Order> orderList = baseMapper.selectList(lambdaQueryWrapper);
-        List<OrderVO> orderVOList = Optional.ofNullable(orderList)
+        return Optional.ofNullable(orderList) //map将orderList转换为orderVOList
                                             .map(list -> list.stream().map(OrderVO::new)
                                                     .collect(Collectors.toList()))
                                             .orElse(null);
-        return orderVOList;
     }
 
 

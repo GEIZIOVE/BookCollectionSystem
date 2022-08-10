@@ -27,12 +27,10 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
 
-
     @Override
     public List<Book> getAllBook(String userId) {
-
         //根据userid查询redis
-        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":"+ "allBook"), Book.class);
+        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":book:"+ "allBook"), Book.class);
         if (list != null) {
             return list;
         }
@@ -40,24 +38,22 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
         List<Book> books =  baseMapper.selectList(Wrappers.lambdaQuery(Book.class).eq(Book::getUserId, userId));
         //将书籍存入redis
         if (books != null && books.size() > 0) {
-            redisTemplate.opsForValue().set(userId +":"+ "allBook", JSON.toJSONString(books), 20, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(userId +":book:"+ "allBook", JSON.toJSONString(books), 20, TimeUnit.SECONDS);
         }
         return books;
     }
 
-
-
     @Override
     public List<Book> getBookList(Integer bookStatus, String userId) {
         //根据userId查询redis
-        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":"+ bookStatus), Book.class);
+        List<Book> list = JSON.parseArray(redisTemplate.opsForValue().get(userId+":book:"+ bookStatus), Book.class);
         if (null != list){
             return list;
         }
         List<Book> books = baseMapper.selectList(Wrappers.lambdaQuery(Book.class).eq(Book::getUserId, userId).eq(Book::getPickStatus, bookStatus));
         //将书籍存入redis
         if (books != null && books.size() > 0) {
-            redisTemplate.opsForValue().set(userId +":"+ bookStatus, JSON.toJSONString(books), 20, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(userId +":book:"+ bookStatus, JSON.toJSONString(books), 20, TimeUnit.SECONDS);
         }
         return books;
     }

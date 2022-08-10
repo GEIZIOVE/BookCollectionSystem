@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * ip工具类
  *
- * @author 11921
+ * @author wqh
  */
 @SuppressWarnings("all")
 public class IpUtils {

@@ -24,9 +24,10 @@ import lombok.Data;
         public Result(){}
 
         protected static <T> Result<T> build(T data) {
-            Result<T> result = new Result<T>();
-            if (data != null)
+            Result<T> result = new Result<>();
+            if (data != null) {
                 result.setData(data);
+            }
             return result;
         }
 
@@ -50,8 +51,6 @@ import lombok.Data;
 
         /**
          * 操作成功
-         * @param data
-         * @param <T>
          * @return
          */
         public static<T> Result<T> ok(T data){
@@ -65,8 +64,6 @@ import lombok.Data;
 
         /**
          * 操作失败
-         * @param data
-         * @param <T>
          * @return
          */
         public static<T> Result<T> fail(T data){

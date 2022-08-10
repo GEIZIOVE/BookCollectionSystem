@@ -1,7 +1,6 @@
 package com.hong.dk.bookcollect.aspect;
 
 import com.alibaba.fastjson.JSON;
-
 import com.hong.dk.bookcollect.entity.annotation.OptLog;
 import com.hong.dk.bookcollect.entity.pojo.OperationLog;
 import com.hong.dk.bookcollect.mapper.OperationLogMapper;
@@ -18,10 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**

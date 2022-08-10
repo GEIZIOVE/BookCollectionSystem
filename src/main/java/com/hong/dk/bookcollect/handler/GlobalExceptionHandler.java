@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
      */
     @ResponseBody
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public Result constraintViolationExceptionHandler(ConstraintViolationException e) {
+    public Result<?> constraintViolationExceptionHandler(ConstraintViolationException e) {
 //        log.debug("[constraintViolationExceptionHandler]", ex);
         // 拼接错误
         StringBuilder detailMessage = new StringBuilder();
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BindException.class) // 处理参数校验异常
     @ResponseBody
-    public Result bindException(BindException e) {
+    public Result<?> bindException(BindException e) {
 //        log.info("BindException异常:{}", e.getMessage());
         // 拼接错误
         StringBuilder detailMessage = new StringBuilder();
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class) // 方法参数校验异常
     @ResponseBody
-    public Result bindException(MethodArgumentNotValidException e) {
+    public Result<?> bindException(MethodArgumentNotValidException e) {
 //        log.info("MethodArgumentNotValidException异常:{}", e.getMessage());
         BindingResult bindingResult = e.getBindingResult(); // 获取BindingResult
         String message = null;
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BookCollectException.class)
     @ResponseBody
-    public Result error(BookCollectException e) {
+    public Result<?> error(BookCollectException e) {
         if (e.getResultCodeEnum() != null) {
             return Result.build(e.getResultCodeEnum().getCode(),
                     e.getResultCodeEnum().getMessage());
@@ -117,7 +117,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseBody
-    public Result error(ExpiredJwtException e) {
+    public Result<?> error(ExpiredJwtException e) {
         return Result.build(ResultCodeEnum.SIGN_EXPIRED.getCode(),
                 ResultCodeEnum.SIGN_EXPIRED.getMessage());
     }
@@ -128,7 +128,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public Result error(Exception e) {
+    public Result<?> error(Exception e) {
         e.printStackTrace();
         return Result.fail("技术问题，请再次刷新页面或联系相关技术人员");
 //        return Result.fail(e.getMessage());

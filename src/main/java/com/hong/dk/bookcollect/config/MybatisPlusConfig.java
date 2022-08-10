@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @MapperScan("com.hong.dk.bookcollect.mapper")
 public class MybatisPlusConfig {
 
-
     /**
      * 分页插件
      */
@@ -22,7 +21,7 @@ public class MybatisPlusConfig {
     /**
      * 乐观锁插件
      *
-     * @return
+     * @return OptimisticLockerInterceptor
      */
     @Bean
     public OptimisticLockerInterceptor optimisticLockerInterceptor() {

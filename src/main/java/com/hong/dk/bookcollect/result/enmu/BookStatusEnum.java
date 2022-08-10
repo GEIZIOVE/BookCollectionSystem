@@ -9,7 +9,7 @@ public enum BookStatusEnum {
     TAKEN_AWAY(1,"已取走"),
     UNDER_APPROVAL(2,"待审批");
 
-    private int bookStatus;
+    private  int bookStatus;
     private String name;
 
     BookStatusEnum(Integer bookStatus, String name){

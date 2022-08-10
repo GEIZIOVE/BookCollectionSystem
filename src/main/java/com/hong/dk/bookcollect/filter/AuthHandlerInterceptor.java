@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -36,10 +37,8 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
         if (!(object instanceof HandlerMethod)) {
             return true;
         }
-//        log.info("=======进入拦截器========");
         //为空就返回错误
         String token = httpServletRequest.getHeader("token");
-//        System.out.println(token);
         if (null == token || "".equals(token.trim())) {
             Asserts.fail(ResultCodeEnum.LOGIN_AUTH);
         }
@@ -52,7 +51,7 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
         //获取token中的用户名
         String userName = JwtHelper.getUserName(token);
         //通过userId查询redis中的token2
-        String token_redis = (String) redisTemplate.opsForValue().get(userId+":"+userId);
+        String token_redis = redisTemplate.opsForValue().get(userId+":"+userId);
         //验证token_redis是否为空，如果为空则将token2存入redis中
         if ( null == token_redis || "".equals(token_redis.trim()) ) {
             redisTemplate.opsForValue().set(userId+":"+userId,token,3600 * 3,TimeUnit.SECONDS);
@@ -61,20 +60,21 @@ public class AuthHandlerInterceptor  extends HandlerInterceptorAdapter {
             Asserts.fail(ResultCodeEnum.REMOTE_LOGIN);
         }
         //token2的过期时间，如果小于1小时，则重新设置过期时间为3小时
-        if ( redisTemplate.getExpire(userId+":"+userId, TimeUnit.SECONDS ) < 3600) {
-             redisTemplate.expire(userId+":"+userId, 3600 * 3, TimeUnit.SECONDS);
-        }
-
+        Optional.ofNullable(redisTemplate.getExpire(userId+":"+userId,TimeUnit.SECONDS)).ifPresent(expire -> {
+            if(expire < 3600){
+                redisTemplate.expire(userId+":"+userId,3600 * 3,TimeUnit.SECONDS);
+            }
+        });
+        //将用户id和用户名存入线程变量
         UserThreadParam userThreadParam = new UserThreadParam();
         userThreadParam.setUserId(userId);
         userThreadParam.setRegister(userName);
         UserUtil.setUserThreadParam(userThreadParam);
-//        log.info("===========放行=========");
         return true;
     }
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        UserUtil.remove(); //清除线程变量
+        UserUtil.remove();
     }
 
 }

@@ -12,7 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface OptLog {
-
     /**
      * @return 操作类型
      */

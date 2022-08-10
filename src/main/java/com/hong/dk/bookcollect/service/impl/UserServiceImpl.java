@@ -3,10 +3,10 @@ package com.hong.dk.bookcollect.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.dk.bookcollect.config.MinioConfig;
+import com.hong.dk.bookcollect.constant.MinIOConst;
 import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.entity.pojo.dto.EmailDTO;
 import com.hong.dk.bookcollect.entity.pojo.param.UserRegisterParam;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +51,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private MinioUtil minioUtil;
     @Autowired
     private MinioConfig prop;
-
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -80,11 +78,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         if (user == null) {
             Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
-        } else if (!user.getPassword().equals(password)) {
+        } else if (!user.getPassword().equals(Md5Util.encryption(password))) {
             Asserts.fail(ResultCodeEnum.DATA_ERROR);
         } else {
             String token = JwtHelper.createToken(user.getUserId(), user.getRegister()); //生成token
-            Integer expire = 2;  //设置存入redis的token有效期2小时
+            int expire = 2;  //设置存入redis的token有效期2小时
             redisTemplate.opsForValue().set(userId+":"+userId,token, expire, TimeUnit.HOURS); //参数依次为 key,value,过期时间,时间单位
             map.put("msg", "登录成功");
             map.put("token",token);
@@ -94,7 +92,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void logout(String userId) {
-        if (!redisTemplate.delete(userId+":"+userId)){
+        if (Boolean.FALSE.equals(redisTemplate.delete(userId + ":" + userId))){
             Asserts.fail(ResultCodeEnum.FAIL);
         }
     }
@@ -102,7 +100,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserVO getUser(String userId) {
 
         //先查询redis中是否存在该用户信息
-        UserVO userVO = JSON.parseObject((String)redisTemplate.opsForValue().get(userId+":"+"userInfo"), UserVO.class);
+        UserVO userVO = JSON.parseObject(redisTemplate.opsForValue().get(userId+":"+"userInfo"), UserVO.class);
         if( null != userVO ) {
             return userVO;
         }
@@ -128,9 +126,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
         }
 
-        String fileName = minioUtil.upload(file);
+        String fileName = minioUtil.upload(file, MinIOConst.MINIO_BUCKET_NAME_AVATAR,userId);
         if (null != fileName) {
-            user.setUserpho(prop.getEndpoint() + "/" + prop.getBucketName() + "/" + fileName);
+            user.setUserpho(prop.getEndpoint() + "/" + MinIOConst.MINIO_BUCKET_NAME_AVATAR + "/" + fileName);
             baseMapper.updateById(user);
             return true;
         }
@@ -159,7 +157,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     @Override
-    public Boolean register(UserRegisterParam userRegisterParam) {
+    public void register(UserRegisterParam userRegisterParam) {
         // 校验账号是否合法
         if (!userRegisterParam.getCode().equals(redisTemplate.opsForValue().get("code:"+userRegisterParam.getEmail()))) {
             Asserts.fail("验证码错误！",201);
@@ -167,7 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 校验邮箱是否已存在
         User userQuery_email = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getEmail, userRegisterParam.getEmail()));
         if (null != userQuery_email) {
-            Asserts.fail("邮箱已存在！",201);
+            Asserts.fail("邮箱已被绑定！",201);
         }
         //根据userid查询用户信息
         User userQuery_userId = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userRegisterParam.getUserId()));
@@ -177,10 +175,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User user = new User();
             BeanUtil.copyProperties(userRegisterParam, user);
             user.setUserpho(Consts.USER_DEFAULT_IMAGE); //默认头像
-            return baseMapper.insert(user) > 0;
+            user.setPassword(Md5Util.encryption(userRegisterParam.getPassword())); //密码加密
+            if(baseMapper.insert(user)<0) {
+                Asserts.fail("未知错误",201);
+            }
         }
-
-        return false;
     }
 
     @Override
@@ -189,10 +188,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = baseMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUserId, userId));
             if (null == user) {
                 Asserts.fail(ResultCodeEnum.USER_NOT_EXIST);
-            } else if (!user.getPassword().equals(oldPassword)) {
+            } else if (!user.getPassword().equals(Md5Util.encryption(oldPassword))) {
                 Asserts.fail(ResultCodeEnum.PASSWORD_ERROR);
             } else {
-                user.setPassword(newPawssword);
+                user.setPassword(Md5Util.encryption(newPawssword));
                 int update = baseMapper.updateById(user);
                 //更新redis的缓存
                 redisTemplate.opsForValue().set(userId+":"+"userInfo", JSON.toJSONString(user),30,TimeUnit.SECONDS);

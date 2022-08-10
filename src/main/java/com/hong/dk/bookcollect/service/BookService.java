@@ -15,8 +15,6 @@ import java.util.List;
  */
 public interface BookService extends IService<Book> {
 
-
-
     List<Book> getAllBook(String userId);
     List<Book> getBookList(Integer bookStatus, String userId);
 }

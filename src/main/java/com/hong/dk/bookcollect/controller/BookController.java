@@ -35,16 +35,15 @@ public class BookController {
 
     @ApiOperation("根据书籍状态查询书籍")
     @GetMapping("/listByStatus")
-public Result list(@RequestParam(required = false) @ApiParam(value = "取件状态 0表示未取，1表示已取走，2表示审批中") Integer bookStatus,
+public Result<?> list(@RequestParam @ApiParam(value = "取件状态 0表示未取，1表示已取走，2表示审批中") Integer bookStatus,
                    @TokenToUser UserToken user){
-
         return Result.ok(bookService.getBookList(bookStatus,user.getUserId()));
     }
 
 
     @ApiOperation("查询所有书籍")
     @GetMapping("/getAllBook")
-    public Result getAllBook(@TokenToUser UserToken user) {
+    public Result<?> getAllBook(@TokenToUser UserToken user) {
         List<Book> list= bookService.getAllBook( user.getUserId());
         return Result.ok(list);
     }

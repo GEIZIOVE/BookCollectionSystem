@@ -10,7 +10,6 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class Swagger2Config {
 
         //添加head参数配置
         ParameterBuilder tokenPar = new ParameterBuilder();
-        List<Parameter> pars = new ArrayList<Parameter>();
+        List<Parameter> pars = new ArrayList<>();
         tokenPar.name("token").description("令牌").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
         pars.add(tokenPar.build());
 
@@ -56,6 +55,5 @@ public class Swagger2Config {
                 .license("Apache License Version 2.0wuhu ")
                 .build();
     }
-
 
 }

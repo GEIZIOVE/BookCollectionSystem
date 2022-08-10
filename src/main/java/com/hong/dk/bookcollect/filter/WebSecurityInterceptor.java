@@ -18,10 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
-
 /**
- * @author hnz
- * @date 2022/3/23 11:21
+ * @author wqh
+ * @date 2022/08/01
  * @description
  */
 @Log4j2
@@ -35,7 +34,6 @@ public class WebSecurityInterceptor implements HandlerInterceptor {
         // 如果请求输入方法
         if (handler instanceof HandlerMethod) { // 如果是方法请求
             HandlerMethod hm = (HandlerMethod) handler;
-            // 获取方法中的注解,看是否有该注解
             AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
             if (accessLimit != null) {
                 long seconds = accessLimit.seconds();
@@ -48,8 +46,7 @@ public class WebSecurityInterceptor implements HandlerInterceptor {
                     if (count != null && count == 1) { // 如果是第一次访问，则设置过期时间
                         redisTemplate.expire(key, seconds, TimeUnit.SECONDS);
                     }
-                    // 此操作代表获取该key对应的值自增1后的结果
-//                    long q = redisService.incrExpire(key, seconds);
+
                     if (count > maxCount) {
                         render(httpServletResponse, Result.fail("请求过于频繁，请稍候再试"));
                         log.warn(key + "请求次数超过每" + seconds + "秒" + maxCount + "次");

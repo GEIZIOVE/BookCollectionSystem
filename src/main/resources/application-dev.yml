@@ -1,29 +1,33 @@
 knife4j:
   enable: true
+
 server:
   port: 8001
 
-
 spring:
-  #Spring Boot 2.6.X使用PathPatternMatcher匹配路径，Swagger引用的Springfox使用的路径匹配是基于AntPathMatcher的，所以需要进行配置
-  mvc:
-    pathmatch:
-      matching-strategy: ANT_PATH_MATCHER
   application:
     name: book-collection
 
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://106.53.124.182:3306/Book_Collection_System?characterEncoding=utf-8&useSSL=false
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
-    initial-size: 5
-    min-idle: 5
-    max-active: 50
-    max-wait: 60000
-    time-between-eviction-runs-millis: 60000
-    min-evictable-idle-time-millis: 300000
+    hikari:
+      minimum-idle: 10 # 池中维护的最小空闲连接数，默认为 10 个。
+      maximum-pool-size: 30 # 池中最大连接数，包括闲置和使用中的连接，默认为 10 个。
+
+  redis:
+    host: 106.53.124.182
+    port: 6379
+    database: 1
+    timeout: 0
+    jedis:
+      pool:
+        max-active: 20 # 连接池最大连接数，默认为 8 。使用负数表示没有限制。
+        max-idle: 8 # 默认连接数最小空闲的连接数，默认为 8 。使用负数表示没有限制。
+        min-idle: 0 # 默认连接池最小空闲的连接数，默认为 0 。允许设置 0 和 正数。
+        max-wait: -1 # 连接池最大阻塞等待时间，单位：毫秒。默认为 -1 ，表示不限制。
 
 
   rabbitmq:
@@ -33,7 +37,7 @@ spring:
     username: root
     password: root
     publisher-returns: true #消息发送到队列确认
-# 我真的不理解为啥邮箱的配置放在yml会爆红？必须得放在properties文件里..... 虽然不影响 但是推代码推不上仓库.......
+# 我真的不理解为啥邮箱的配置放在yml会爆红？必须得放在properties文件里..... 虽然不影响运行 但是推代码推不上仓库.......
 #  mail:
 #    host: smtp.qq.com #邮件服务器地址
 #    username: 1601709391@qq.com #邮件服务器用户名
@@ -46,7 +50,6 @@ spring:
 #      auth: true
 #      socketFactory:
 #      class: javax.net.ssl.SSLSocketFactory
-
   servlet:
     multipart:
       enabled: true #开启文件上传
@@ -61,7 +64,6 @@ mybatis-plus:
 
 minio:
   endpoint: http://106.53.124.182:9000
-  bucketName: public
   accessKey: OV5xLXR9kUxpO3Oi
   secretKey: w0UvfFW2NNVkVj7N4JeeVUfH1wpEpOFj
 

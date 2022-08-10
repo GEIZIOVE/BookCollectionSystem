@@ -15,15 +15,12 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.validation.Valid;
-
 import java.util.Map;
 
-import static com.hong.dk.bookcollect.entity.annotation.OptTypeConst.*;
+import static com.hong.dk.bookcollect.constant.OptTypeConst.*;
 
 /**
  * <p>
@@ -38,18 +35,19 @@ import static com.hong.dk.bookcollect.entity.annotation.OptTypeConst.*;
 @RequestMapping("/user")
 
 public class UserController {
+
     @Autowired
     private UserService userService;
     @ApiOperation("用户登录")
     @PostMapping("/login")
-    public Result login(@RequestBody @Valid UserLoginParam userLoginParam) {//, BindingResult bindingResult
+    public Result<?> login(@RequestBody @Valid UserLoginParam userLoginParam) {//, BindingResult bindingResult
         Map<String, Object> map = userService.login(userLoginParam.getUserId(), userLoginParam.getPassword());
         return Result.ok(map);
     }
 
     @ApiOperation("退出登录")
     @PostMapping("/logout")
-    public Result logout(@TokenToUser UserToken user) {
+    public Result<?> logout(@TokenToUser UserToken user) {
          userService.logout(user.getUserId());
          return Result.ok();
 
@@ -58,14 +56,9 @@ public class UserController {
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public Result register(@RequestBody @Valid UserRegisterParam userRegisterParam) {
-
-        Boolean flag = userService.register(userRegisterParam);
-        if (flag) {
-            return Result.ok("注册成功");
-        } else {
-            return Result.fail("注册失败");
-        }
+    public Result<?> register(@RequestBody @Valid UserRegisterParam userRegisterParam) {
+        userService.register(userRegisterParam);
+        return Result.ok();
     }
 
     @ApiOperation("修改密码")
@@ -82,9 +75,8 @@ public class UserController {
     }
 
     @ApiOperation("用户上传头像")
-    @OptLog(optType = UPLOAD)
     @PostMapping("/uploadAvatar")
-public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFile file,
+public Result<?> uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFile file,
                            @TokenToUser UserToken user) {
         Boolean flag = userService.uploadAvatar(file, user.getUserId());
         if (flag) {
@@ -95,9 +87,9 @@ public Result uploadAvatar(@ApiParam("头像") @RequestParam("file") MultipartFi
     }
 
     @ApiOperation("获取用户信息")
+    @AccessLimit(maxCount = 10, seconds = 60)
     @GetMapping("/getUser")
     public Result<UserVO> getUser(@TokenToUser UserToken user) {
-
         return Result.ok(userService.getUser(user.getUserId()));
     }
 

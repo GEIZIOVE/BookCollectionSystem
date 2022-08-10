@@ -14,6 +14,8 @@ public class MQPrefixConst {
      */
     public static final String CANAL_EXCHANGE = "canal.exchange";
 
+    public static final String CANAL_QUEUE = "canal.queue";
+
     /**
      * canal队列 监听book表
      */
@@ -37,6 +39,8 @@ public class MQPrefixConst {
     public static final String CANAL_APPEAL_KEY = "bcs_appeal";
 
     public static final String CANAL_ORDER_KEY = "bcs_bcs_order";
+
+    public static final String CANAL_ROUTING_KEY = "canal_routing_key";
 
 
 

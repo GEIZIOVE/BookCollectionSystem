@@ -2,6 +2,7 @@ package com.hong.dk.bookcollect.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.hong.dk.bookcollect.config.MinioConfig;
+import com.hong.dk.bookcollect.constant.MinIOConst;
 import com.hong.dk.bookcollect.entity.pojo.Appeal;
 import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.handler.Asserts;
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
  */
 @Service
 public class AppealServiceImpl extends ServiceImpl<AppealMapper, Appeal> implements AppealService {
-
     @Autowired
     private MinioUtil minioUtil;
     @Autowired
@@ -52,9 +52,9 @@ public class AppealServiceImpl extends ServiceImpl<AppealMapper, Appeal> impleme
         appeal1.setUserId(userId);//设置用户id
         appeal1.setAppealTime(LocalDateTime.now());//设置申诉时间
         //将图片上传到minio服务器
-        String objectName = minioUtil.upload(file);
+        String objectName = minioUtil.upload(file, MinIOConst.MINIO_BUCKET_NAME_APPEAL,userId);
         if (null != objectName) {
-            appeal1.setPhoto( prop.getEndpoint() + "/" + prop.getBucketName() + "/" + objectName ); ;
+            appeal1.setPhoto( prop.getEndpoint() + "/" + MinIOConst.MINIO_BUCKET_NAME_APPEAL + "/" + objectName );
         }
         // 将申诉信息插入数据库
         if (!(this.baseMapper.insert(appeal1) > 0)){

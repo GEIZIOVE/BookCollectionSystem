@@ -22,6 +22,17 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue canalQueue() { // 创建一个队列
+        return new Queue(CANAL_QUEUE, true);
+    }
+
+    @Bean
+    public Binding canalBinding() { // 将队列与交换器绑定
+        return BindingBuilder.bind(canalQueue()).to(canalExchange()).with(CANAL_ROUTING_KEY);
+    }
+
+
+    @Bean
     public Queue canalBookQueue() { // 创建一个队列
         return new Queue(CANAL_BOOK_QUEUE, true);
     }

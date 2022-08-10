@@ -12,7 +12,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.hong.dk.bookcollect.entity.annotation.OptTypeConst.SAVE;
+import static com.hong.dk.bookcollect.constant.OptTypeConst.SAVE;
 
 
 /**
@@ -34,20 +34,19 @@ public class OrderController {
     @ApiOperation(value = "生成订单信息")
     @OptLog(optType = SAVE)
     @PostMapping("/saveOrder")
-    public Result saveOrder(@ApiParam("书籍id集合") @RequestParam String bookIdArray, @TokenToUser UserToken user) {
-
+    public Result<?> saveOrder(@ApiParam("书籍id集合") @RequestParam String bookIdArray, @TokenToUser UserToken user) {
         return Result.ok(orderService.saveOrder(bookIdArray,user.getUserId()));
     }
 
     @ApiOperation(value = "根据orderId获取订单信息")
     @GetMapping("/getOrderById")
-    public Result getOrderById(@ApiParam("订单id") @RequestParam String orderId) {
+    public Result<?> getOrderById(@ApiParam("订单id") @RequestParam String orderId) {
         return Result.ok(orderService.getOrderById(orderId));
     }
 
     @ApiOperation(value = "获取所有订单信息")
     @GetMapping("/getAllOrder")
-    public Result getAllOrder(@TokenToUser UserToken user) {
+    public Result<?> getAllOrder(@TokenToUser UserToken user) {
         return Result.ok(orderService.getAllOrder(user.getUserId()));
     }
 

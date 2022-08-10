@@ -18,8 +18,7 @@ public interface OrderService extends IService<Order> {
 
     /**
      * 生成订单信息
-     * @param bookIdArray
-     * @return
+     * @return map集合
      */
     Map<String,Object> saveOrder(String bookIdArray, String userId);
 

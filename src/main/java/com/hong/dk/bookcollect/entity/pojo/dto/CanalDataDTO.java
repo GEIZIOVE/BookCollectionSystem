@@ -1,20 +1,10 @@
 package com.hong.dk.bookcollect.entity.pojo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
-import java.util.Map;
 
-/**
- * maxwell监听数据
- *
- * @author yezhqiu
- * @date 2021/07/02
- * @since 1.0.0
- **/
 @NoArgsConstructor
 @Data
 public class CanalDataDTO<T> {

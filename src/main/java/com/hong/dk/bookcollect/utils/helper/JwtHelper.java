@@ -2,7 +2,6 @@ package com.hong.dk.bookcollect.utils.helper;
 
 import io.jsonwebtoken.*;
 import org.springframework.util.StringUtils;
-
 import java.util.Date;
 
 public class JwtHelper {
@@ -27,7 +26,9 @@ public class JwtHelper {
 
     //根据token字符串得到用户id
     public static String getUserId(String token) {
-        if(StringUtils.isEmpty(token)) return null; //如果token为空,则返回null
+        if(StringUtils.isEmpty(token)) {
+            return null; //如果token为空,则返回null
+        }
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);  //解析token
         Claims claims = claimsJws.getBody(); //得到payload部分
         String userId = (String) claims.get("userId");
@@ -36,7 +37,9 @@ public class JwtHelper {
 
     //根据token字符串得到用户名称
     public static String getUserName(String token) {
-        if(StringUtils.isEmpty(token)) return "";
+        if(StringUtils.isEmpty(token)) {
+            return "";
+        }
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);
         Claims claims = claimsJws.getBody();
         return (String)claims.get("userName");
@@ -44,11 +47,13 @@ public class JwtHelper {
 
     //判断token是否过期
     public static boolean isTokenExpired(String dubToken) {
-        if(StringUtils.isEmpty(dubToken)) return true;
-        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(dubToken);
-        Claims claims = claimsJws.getBody();
-        Date expiration = claims.getExpiration();
-        if(expiration.getTime() < System.currentTimeMillis()) {
+        if(StringUtils.isEmpty(dubToken)) { //如果token为空,则返回true
+            return true;
+        }
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(dubToken); //解析token
+        Claims claims = claimsJws.getBody();  //得到payload部分
+        Date expiration = claims.getExpiration();  //得到过期时间
+        if(expiration.getTime() < System.currentTimeMillis()) { //如果过期时间小于当前时间,则返回true
             return true;
         }
         return false;
