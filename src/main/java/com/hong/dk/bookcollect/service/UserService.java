@@ -26,19 +26,14 @@ public interface UserService extends IService<User> {
     /**
      * 用户注册
      *
-     * @param userRegisterParam
-     * @return
      */
     void register(UserRegisterParam userRegisterParam);
 
     /**
      * 修改密码
      *
-     * @param oldPassword
-     * @param newPawssword
-     * @return
      */
-    Boolean updatePassword(String oldPassword, String newPawssword, String userId);
+    Boolean updatePassword(String oldPassword, String newPassword, String userId);
 
 
     void logout(String userId);

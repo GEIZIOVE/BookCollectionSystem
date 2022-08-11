@@ -10,7 +10,6 @@ import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.entity.pojo.dto.CanalDataDTO;
 import com.hong.dk.bookcollect.entity.pojo.dto.EmailDTO;
 import com.hong.dk.bookcollect.mapper.UserMapper;
-import com.hong.dk.bookcollect.utils.UserUtil;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -21,7 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
 
 import static com.hong.dk.bookcollect.constant.MQPrefixConst.*;
 import static com.hong.dk.bookcollect.constant.MailInfoConst.MAIL_SUBJECT_APPROVED;
@@ -82,7 +81,7 @@ public class CanalConsumer {
                                 EmailDTO emailDTO = new EmailDTO(); //创建邮件DTO对象
                                 emailDTO.setEmail(email);
                                 emailDTO.setSubject(MAIL_SUBJECT_APPROVED);
-                                emailDTO.setContent("密码申诉审核已经通过");
+                                emailDTO.setContent("密码申诉审核已经通过,初始化为学号后六位");
                                 rabbitTemplate.convertAndSend(EMAIL_EXCHANGE, "*", new Message(JSON.toJSONBytes(emailDTO), new MessageProperties()));//参数1：交换机名称，参数2：路由键，参数3：消息内容，参数4：消息属性
                             }
                         }

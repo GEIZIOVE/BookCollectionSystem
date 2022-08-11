@@ -64,7 +64,7 @@ public class EmailConsumer {
             valueMap.put("code", codeList);
             Context context = new Context();
             context.setVariables(valueMap);
-            String content = this.templateEngine.process("code_email2", context);
+            String content = this.templateEngine.process("code_email", context);
             helper.setText(content, true);
         }else {
             //        valueMap.put("to", emailDTO.getEmail());

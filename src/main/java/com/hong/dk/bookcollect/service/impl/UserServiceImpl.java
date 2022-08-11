@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.dk.bookcollect.config.MinioConfig;
+import com.hong.dk.bookcollect.constant.MailInfoConst;
 import com.hong.dk.bookcollect.constant.MinIOConst;
 import com.hong.dk.bookcollect.entity.pojo.User;
 import com.hong.dk.bookcollect.entity.pojo.dto.EmailDTO;
@@ -147,11 +148,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 发送验证码
         EmailDTO emailDTO = EmailDTO.builder()
                 .email(email)
-                .subject("验证码")
+                .subject(MailInfoConst.MAIL_SUBJECT_REGISTER)
                 .content(code)
                 .build();
         rabbitTemplate.convertAndSend(EMAIL_EXCHANGE, "*", new Message(JSON.toJSONBytes(emailDTO), new MessageProperties()));
-        // 将验证码存入redis，设置过期时间为15分钟
+        // 将验证码存入redis，设置过期时间为10分钟
         redisTemplate.opsForValue().set("code:"+email, code, 10, TimeUnit.MINUTES);
     }
 

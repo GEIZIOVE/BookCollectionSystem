@@ -32,5 +32,4 @@ public class OrderBook extends BaseEntity {
     @ApiModelProperty(value = "书籍id")
     private String bookId;
 
-
 }

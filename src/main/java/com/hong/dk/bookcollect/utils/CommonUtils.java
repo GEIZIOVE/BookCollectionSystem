@@ -60,7 +60,7 @@ public class CommonUtils {
      * @return {@link List<T>}
      */
     public static <T> List<T> castList(Object obj, Class<T> clazz) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         if (obj instanceof List<?>) {
             for (Object o : (List<?>) obj) {
                 result.add(clazz.cast(o));

@@ -2,6 +2,7 @@ package com.hong.dk.bookcollect.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hong.dk.bookcollect.entity.pojo.Order;
+import com.hong.dk.bookcollect.entity.pojo.vo.OrderInformationVO;
 import com.hong.dk.bookcollect.entity.pojo.vo.OrderVO;
 import java.util.List;
 import java.util.Map;
@@ -25,4 +26,6 @@ public interface OrderService extends IService<Order> {
     OrderVO getOrderById(String orderId);
 
     List<OrderVO> getAllOrder(String userId);
+
+    List<OrderInformationVO> getOrderByStatus(Integer status);
 }

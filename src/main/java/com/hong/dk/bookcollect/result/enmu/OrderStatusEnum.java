@@ -9,8 +9,8 @@ public enum OrderStatusEnum { //审批状态 0:待审批 1:同意 2:拒绝
     TAKEN_AWAY(1,"同意"),
     UNDER_APPROVAL(2,"拒绝");
 
-    private int orderStatus;
-    private String name;
+    private final int orderStatus;
+    private final String name;
 
     OrderStatusEnum(Integer bookStatus, String name){
         this.orderStatus=bookStatus;

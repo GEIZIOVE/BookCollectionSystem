@@ -10,7 +10,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.Size;
 
 import static com.hong.dk.bookcollect.constant.OptTypeConst.SAVE;
 
@@ -26,6 +29,7 @@ import static com.hong.dk.bookcollect.constant.OptTypeConst.SAVE;
 @Api(tags = "订单信息接口")
 @RestController
 @RequestMapping("/order")
+@Validated
 public class OrderController {
 
     @Autowired
@@ -40,7 +44,7 @@ public class OrderController {
 
     @ApiOperation(value = "根据orderId获取订单信息")
     @GetMapping("/getOrderById")
-    public Result<?> getOrderById(@ApiParam("订单id") @RequestParam String orderId) {
+    public Result<?> getOrderById(@ApiParam("订单id") @RequestParam @Size(max = 17,min = 17 ,message = "订单号长度必须为17位") String orderId) {
         return Result.ok(orderService.getOrderById(orderId));
     }
 
@@ -50,6 +54,10 @@ public class OrderController {
         return Result.ok(orderService.getAllOrder(user.getUserId()));
     }
 
-
+    @ApiOperation(value = "根据status获取订单信息")
+    @GetMapping("/getOrderByUserId")
+    public Result<?> getOrderByStatus(Integer status){
+        return Result.ok(orderService.getOrderByStatus(status));
+    }
 }
 

@@ -33,7 +33,6 @@ import static com.hong.dk.bookcollect.constant.OptTypeConst.*;
 @Api(value = "用户表(user)接口", tags = "用户表(user)接口")
 @RestController
 @RequestMapping("/user")
-
 public class UserController {
 
     @Autowired

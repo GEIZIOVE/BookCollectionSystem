@@ -1,9 +1,7 @@
 package com.hong.dk.bookcollect.utils;
 
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
-
 import java.util.Random;
 
 public class OrderUtil {
@@ -14,11 +12,13 @@ public class OrderUtil {
     public static String getOrderNo() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String newDate = sdf.format(new Date());
-        String result = "";
+        StringBuilder result = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < 3; i++) {
-            result += random.nextInt(10);
+            result.append(random.nextInt(10));
         }
         return newDate + result;
     }
+
+
 }

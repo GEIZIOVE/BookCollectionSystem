@@ -62,7 +62,6 @@ public class MinioUtil {
         }
         //判断是否存在bucket
         if (!bucketExists(bucketName)) {
-            //创建bucket
             makeBucket(bucketName);
         }
         //获取文件后缀名

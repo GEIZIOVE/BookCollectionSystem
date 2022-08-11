@@ -9,19 +9,18 @@ public class JwtHelper {
     //过期时间
     public static long tokenExpiration = 10*60*60*1000; //10小时
     //签名秘钥
-    private static String tokenSignKey = "123456";
+    private static final String tokenSignKey = "123456";
 
     //根据参数生成token
     public static String createToken(String userId, String userName) {
-        String token = Jwts.builder() //JWT由三部分组成：header、payload、signature
+        return Jwts.builder() //JWT由三部分组成：header、payload、signature
                 .setSubject("USER") //主题
                 .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration)) //过期时间
                 .claim("userId", userId)
                 .claim("userName", userName)
                 .signWith(SignatureAlgorithm.HS512, tokenSignKey) //签名算法和签名秘钥
                 .compressWith(CompressionCodecs.GZIP) //压缩方式
-                .compact(); //生成token
-        return token;
+                .compact();
     }
 
     //根据token字符串得到用户id
@@ -31,8 +30,7 @@ public class JwtHelper {
         }
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);  //解析token
         Claims claims = claimsJws.getBody(); //得到payload部分
-        String userId = (String) claims.get("userId");
-        return userId;
+        return (String) claims.get("userId");
     }
 
     //根据token字符串得到用户名称
@@ -53,10 +51,8 @@ public class JwtHelper {
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(dubToken); //解析token
         Claims claims = claimsJws.getBody();  //得到payload部分
         Date expiration = claims.getExpiration();  //得到过期时间
-        if(expiration.getTime() < System.currentTimeMillis()) { //如果过期时间小于当前时间,则返回true
-            return true;
-        }
-        return false;
+        //如果过期时间小于当前时间,则返回true
+        return expiration.getTime() < System.currentTimeMillis();
 
     }
 }

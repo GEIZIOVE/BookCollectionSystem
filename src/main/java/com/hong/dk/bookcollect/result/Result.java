@@ -82,9 +82,6 @@ import lombok.Data;
         }
 
         public boolean isOk() {
-            if(this.getCode().intValue() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-                return true;
-            }
-            return false;
+            return this.getCode().intValue() == ResultCodeEnum.SUCCESS.getCode().intValue();
         }
     }

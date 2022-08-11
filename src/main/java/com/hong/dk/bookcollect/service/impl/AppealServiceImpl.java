@@ -48,7 +48,8 @@ public class AppealServiceImpl extends ServiceImpl<AppealMapper, Appeal> impleme
         if(null != appeal && appeal.getAuditStatus() == 0){
             Asserts.fail(ResultCodeEnum.APPEAL_ING);
         }
-        Appeal appeal1 = new Appeal();//创建一个申诉对象
+
+        Appeal appeal1 = new Appeal();
         appeal1.setUserId(userId);//设置用户id
         appeal1.setAppealTime(LocalDateTime.now());//设置申诉时间
         //将图片上传到minio服务器
